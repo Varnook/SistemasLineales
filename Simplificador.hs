@@ -1,41 +1,5 @@
-module Simbolos	(Expresion (..),simplificar) where
-
---declaracion de nueva clase "Expresión"
-data Expresion a = Constante a
-	| Variable String
-	| Suma (Expresion a) (Expresion a)
-	| Producto (Expresion a) (Expresion a)
-	| Negacion (Expresion a)
-	| Igualdad (Expresion a) (Expresion a)
-	deriving(Eq)
-
---dependencias de las clases de operacion
-instance (Num a) => Num (Expresion a) where
-	(+) = Suma
-	a - b = Suma a (Negacion b)
-	(*) = Producto
-	negate = Negacion 
-	abs = undefined
-	signum = undefined
-	fromInteger = undefined
-
---dependencias de todas las clases para poder aparecer en pantalla
-instance (Show a) => Show (Expresion a) where
-	show (Constante a) = show a
-	show (Variable a) = a
-	show (Suma a b) = show a ++ "+" ++ show b
-	show (Negacion a) = "(" ++ "-" ++  show a ++ ")" 
-	show (Producto a b) = show a ++ "*" ++ show b
-	show (Igualdad a b) = show a ++ "=" ++ show b
-
-agregarVariables :: (Num a) => [a] -> Expresion a
-agregarVariables [] = Constante 0
-agregarVariables incognitas@(x:xs) = (Constante x * Variable (show (length incognitas))) + (agregarVariables xs)
-
-agregarVariablesConNombre :: (Num a) => [String] -> [a] -> Expresion a
-agregarVariablesConNombre [] _ = Constante 0
-agregarVariablesConNombre (x:xs) (c:cs) = (Constante c) * (Variable x) + (agregarVariablesConNombre xs cs)
-
+module Simplificador (simplificar) where
+import Expresiones (Expresion(..))
 --descripcion de los axiomas para poder usar en la simplificacion de una expresion
 --no estan completos, ya que se escribieron los necesarios para resolver sistemas lineales.
 axiomas :: (Num a, Eq a) => Expresion a -> Expresion a
@@ -107,14 +71,4 @@ simplificar a = a_simplificada a
 		a_simplificada a
 			| paso == a = a
 			| otherwise = simplificar paso
-{-
-igualar :: (Num a, Eq a) => Expresion a -> Expresion a -> Expresion a
 
-igualar (Variable x) (Constante b) = Igualdad (Variable x) (Constante b)
-igualar (Suma (Variable x) (Variable y)) (Constante b) = Igualdad (Variable x) (Constante b - Variable y)
-igualar (Suma (Variable x) (Producto (Constante k) (Variable y))) (Constante b) = Igualdad (Variable x) (Constante b -  Constante k * Variable y)
-
-resolver :: (Num a, Eq a) => [(Expresion a, Expresion a)] -> [(Expresion a, Expresion a)]
-resolver [] = []
-resolver (expr:exs) = igualar (fst (simplificar expr)) (snd expr)
--}
