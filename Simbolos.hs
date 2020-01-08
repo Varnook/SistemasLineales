@@ -107,7 +107,7 @@ simplificar a = a_simplificada a
 		a_simplificada a
 			| paso == a = a
 			| otherwise = simplificar paso
-
+{-
 igualar :: (Num a, Eq a) => Expresion a -> Expresion a -> Expresion a
 
 igualar (Variable x) (Constante b) = Igualdad (Variable x) (Constante b)
@@ -117,3 +117,4 @@ igualar (Suma (Variable x) (Producto (Constante k) (Variable y))) (Constante b) 
 resolver :: (Num a, Eq a) => [(Expresion a, Expresion a)] -> [(Expresion a, Expresion a)]
 resolver [] = []
 resolver (expr:exs) = igualar (fst (simplificar expr)) (snd expr)
+-}
