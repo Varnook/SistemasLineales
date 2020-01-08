@@ -1,5 +1,6 @@
 module Simplificador (simplificar) where
 import Expresiones (Expresion(..))
+
 --descripcion de los axiomas para poder usar en la simplificacion de una expresion
 --no estan completos, ya que se escribieron los necesarios para resolver sistemas lineales.
 axiomas :: (Num a, Eq a) => Expresion a -> Expresion a
@@ -12,6 +13,8 @@ axiomas (Negacion (Producto a b)) = (Negacion (axiomas a)) * axiomas b
 axiomas (Suma (Constante a) (Constante b)) = Constante (a + b)
 axiomas (Suma (Constante 0) a) = axiomas a
 axiomas (Suma a (Constante 0)) = axiomas a
+axiomas (Suma a (Negacion a)) = Constante 0
+axiomas (Suma (Negacion a) a) = Constante 0
 
 axiomas (Producto (Constante a) (Constante b)) = Constante (a * b)
 axiomas (Producto (Constante 0) a) = Constante 0
@@ -60,7 +63,6 @@ axiomas (Suma (Producto y (Constante a)) x)
 axiomas (Producto a b) = axiomas a * axiomas b
 
 axiomas (Suma a b) | a == b = (Constante 2) * axiomas a
-	| a == (Negacion b) = Constante 0
 	| otherwise = axiomas a + axiomas b
 
 axiomas a = a
@@ -71,4 +73,3 @@ simplificar a = a_simplificada a
 		a_simplificada a
 			| paso == a = a
 			| otherwise = simplificar paso
-
