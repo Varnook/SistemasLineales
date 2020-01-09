@@ -14,7 +14,7 @@ rplzVar exprInicial exprABuscar exprIn | exprInicial == exprABuscar = exprIn
 	| simplificar (Producto (Constante (-1)) exprInicial) == exprABuscar = - exprIn -- -eIni == eAB = -eI
 	| otherwise = exprInicial
 
---como se obtiene informacion de "Igual"
+--como se obtiene informacion del tipo de dato "Igual"
 igualdadEnTupla :: (Num a, Eq a) => Expresion a -> (Expresion a, Expresion a)
 igualdadEnTupla (Igual x b) = (x,b)
 
@@ -28,9 +28,15 @@ agregarVariablesConNombre :: (Num a) => [String] -> [a] -> Expresion a
 agregarVariablesConNombre [] _ = Constante 0
 agregarVariablesConNombre (x:xs) (c:cs) = (Constante c) * (Variable x) + (agregarVariablesConNombre xs cs)
 
+--funciones para formar la ecuacion
 igualar :: (Num a) => Expresion a -> a -> Expresion a
 igualar expr numero = Igual expr (Constante numero)
 
 formarEcuacion :: (Num a) => [a] -> [String] -> Expresion a
 formarEcuacion constantes [] = igualar (agregarVariables constantes) (last constantes)
 formarEcuacion constantes incognitas = igualar (agregarVariablesConNombre incognitas constantes) (last constantes)
+
+--dada una variable de una ecuacion, se busca dejarla del lado izquierdo del igual
+aislarVariable :: (Num a, Eq a) => Expresion a -> Expresion a-> Expresion a
+aislarVariable _ (Igual (Variable x) (Constante b)) = Igual (Variable x) (Constante b)
+aislarVariable var (Igual (Suma x (Variable y)) (Constante b)) | var == x = Igual var (Constante b - Variable y)
