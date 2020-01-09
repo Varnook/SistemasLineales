@@ -23,6 +23,7 @@ instance (Num a) => Num (Expresion a) where
 instance (Show a) => Show (Expresion a) where
 	show (Constante a) = show a
 	show (Variable a) = a
+	show (Suma a (Negacion b)) = show a ++ " - " ++ show b
 	show (Suma a b) = show a ++ " + " ++ show b
 	show (Negacion a) = "(" ++ "-" ++  show a ++ ")" 
 	show (Producto a b) = show a ++ "*" ++ show b
