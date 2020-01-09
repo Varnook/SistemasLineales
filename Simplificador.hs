@@ -3,7 +3,7 @@ import Expresiones (Expresion(..))
 
 --descripcion de los axiomas para poder usar en la simplificacion de una expresion
 --no estan completos, ya que se escribieron los necesarios para resolver sistemas lineales.
-axiomas :: (Num a, Eq a) => Expresion a -> Expresion a
+axiomas :: (Num a, Fractional a, Eq a) => Expresion a -> Expresion a
 
 axiomas (Negacion (Constante a)) = Constante (-a)
 axiomas (Negacion (Variable a)) = (Constante (-1)) * (Variable a)
@@ -12,13 +12,19 @@ axiomas (Negacion (Producto a b)) = (Negacion (axiomas a)) * axiomas b
 
 axiomas (Suma (Constante a) (Constante b)) = Constante (a + b)
 axiomas (Suma (Constante 0) a) = axiomas a
+axiomas (Suma (Constante 0.0) a) = axiomas a
 axiomas (Suma a (Constante 0)) = axiomas a
+axiomas (Suma a (Constante 0.0)) = axiomas a
 
-axiomas (Producto (Constante a) (Constante b)) = Constante (a * b)
+axiomas (Producto (Constante a) (Constante b)) = Constante (a * b) 
 axiomas (Producto (Constante 0) a) = Constante 0
+axiomas (Producto (Constante 0.0) a) = Constante 0
 axiomas (Producto a (Constante 0)) = Constante 0
+axiomas (Producto a (Constante 0.0)) = Constante 0
 axiomas (Producto (Constante 1) a) = axiomas a
+axiomas (Producto (Constante 1.0) a) = axiomas a
 axiomas (Producto a (Constante 1)) = axiomas a
+axiomas (Producto a (Constante 1.0)) = axiomas a
 
 axiomas (Producto (Constante a) (Producto (Constante b) expr)) = Constante (a * b) * axiomas expr 
 axiomas (Producto (Constante a) (Producto expr (Constante b))) = Constante (a * b) * axiomas expr 

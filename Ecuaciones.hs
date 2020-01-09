@@ -4,7 +4,7 @@ import Simplificador (simplificar)
 --en una expresion cualquiera, reemplazo la variable (exprABuscar) dada 
 --(que el segundo parametro sea una variable no está explícito en la función)
 --por la expresion de entrada (exprIn)
-rplzVar :: (Num a, Eq a) => Expresion a -> Expresion a -> Expresion a -> Expresion a
+rplzVar :: (Num a, Fractional a, Eq a) => Expresion a -> Expresion a -> Expresion a -> Expresion a
 
 rplzVar (Suma expr1 expr2) exprABuscar exprIn = (rplzVar expr1 exprABuscar exprIn) + (rplzVar expr2 exprABuscar exprIn)
 
@@ -37,6 +37,21 @@ formarEcuacion constantes [] = igualar (agregarVariables constantes) (last const
 formarEcuacion constantes incognitas = igualar (agregarVariablesConNombre incognitas constantes) (last constantes)
 
 --dada una variable de una ecuacion, se busca dejarla del lado izquierdo del igual
-aislarVariable :: (Num a, Eq a) => Expresion a -> Expresion a-> Expresion a
+aislarVariable :: (Num a, Fractional a, Eq a) => Expresion a -> Expresion a-> Expresion a
 aislarVariable _ (Igual (Variable x) (Constante b)) = Igual (Variable x) (Constante b)
-aislarVariable var (Igual (Suma x (Variable y)) (Constante b)) | var == x = Igual var (Constante b - Variable y)
+
+aislarVariable var (Igual (Suma (Variable x) (Variable y)) (Constante b)) 
+	| var == Variable x = Igual var (Constante b - Variable y)
+	| var == Variable y = Igual var (Constante b - Variable x)
+
+aislarVariable var (Igual (Suma (Variable x) (Producto (Constante a) (Variable y))) (Constante b))
+	| var == Variable x = Igual var (Constante b - (Producto (Constante a) (Variable y)))
+	| var == Variable y = Igual var (Constante (b*(1/a)) - (Producto (Constante (1/a)) (Variable x)))
+
+aislarVariable var (Igual (Suma (Producto (Constante a) (Variable y)) (Variable x)) (Constante b))
+	| var == Variable x = Igual var (Constante b - (Producto (Constante a) (Variable y)))
+	| var == Variable y = Igual var (Constante (b*(1/a)) - (Producto (Constante (1/a)) (Variable x)))
+
+aislarVariable var (Igual (Suma (Producto (Constante r) (Variable x)) (Producto (Constante s) (Variable y))) (Constante b)) -- r*x + s*y = b
+	| var == Variable x = Igual var (Constante (b*(1/r)) - (Producto (Constante (s*(1/r))) (Variable y)))
+	| var == Variable y = Igual var (Constante (b*(1/s)) - (Producto (Constante (r*(1/s))) (Variable x)))
