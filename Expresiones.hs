@@ -27,11 +27,3 @@ instance (Show a) => Show (Expresion a) where
 	show (Negacion a) = "(" ++ "-" ++  show a ++ ")" 
 	show (Producto a b) = show a ++ "*" ++ show b
 	show (Igual a b) = show a ++ " = " ++ show b
-
-agregarVariables :: (Num a) => [a] -> Expresion a
-agregarVariables [] = Constante 0
-agregarVariables incognitas@(x:xs) = (Constante x * Variable (show (length incognitas))) + (agregarVariables xs)
-
-agregarVariablesConNombre :: (Num a) => [String] -> [a] -> Expresion a
-agregarVariablesConNombre [] _ = Constante 0
-agregarVariablesConNombre (x:xs) (c:cs) = (Constante c) * (Variable x) + (agregarVariablesConNombre xs cs)

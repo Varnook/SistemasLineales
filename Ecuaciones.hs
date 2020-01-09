@@ -1,7 +1,36 @@
 import Expresiones (Expresion(..))
 import Simplificador (simplificar)
-reemplazarVariable :: (Num a, Eq a) => Expresion a -> Expresion a -> Expresion a -> Expresion a
-reemplazarVariable (Suma expr1 expr2) exprABuscar exprIn = (reemplazarVariable expr1 exprABuscar exprIn) + (reemplazarVariable expr2 exprABuscar exprIn)
-reemplazarVariable (Producto expr1 expr2) exprABuscar exprIn = (reemplazarVariable expr1 exprABuscar exprIn) * (reemplazarVariable expr2 exprABuscar exprIn)
-reemplazarVariable exprInicial exprABuscar exprIn | exprInicial == exprABuscar = exprIn
+
+--en una expresion cualquiera, reemplazo la variable (exprABuscar) dada 
+--(que el segundo parametro sea una variable no está explícito en la función)
+--por la expresion de entrada (exprIn)
+rplzVar :: (Num a, Eq a) => Expresion a -> Expresion a -> Expresion a -> Expresion a
+
+rplzVar (Suma expr1 expr2) exprABuscar exprIn = (rplzVar expr1 exprABuscar exprIn) + (rplzVar expr2 exprABuscar exprIn)
+
+rplzVar  (Producto expr1 expr2) exprABuscar exprIn = (rplzVar expr1 exprABuscar exprIn) * (rplzVar expr2 exprABuscar exprIn)
+
+rplzVar exprInicial exprABuscar exprIn | exprInicial == exprABuscar = exprIn
+	| simplificar (Producto (Constante (-1)) exprInicial) == exprABuscar = - exprIn -- -eIni == eAB = -eI
 	| otherwise = exprInicial
+
+--como se obtiene informacion de "Igual"
+igualdadEnTupla :: (Num a, Eq a) => Expresion a -> (Expresion a, Expresion a)
+igualdadEnTupla (Igual x b) = (x,b)
+
+--como pasar de un vector de Num a a una igualdad sin que se indique el nombre de las variables...
+agregarVariables :: (Num a) => [a] -> Expresion a
+agregarVariables (x:[]) = Constante 0
+agregarVariables incognitas@(x:xs) = (Constante x * Variable (show (length incognitas))) + (agregarVariables xs)
+
+-- ...y dando el nombre explícito de las variables
+agregarVariablesConNombre :: (Num a) => [String] -> [a] -> Expresion a
+agregarVariablesConNombre [] _ = Constante 0
+agregarVariablesConNombre (x:xs) (c:cs) = (Constante c) * (Variable x) + (agregarVariablesConNombre xs cs)
+
+igualar :: (Num a) => Expresion a -> a -> Expresion a
+igualar expr numero = Igual expr (Constante numero)
+
+formarEcuacion :: (Num a) => [a] -> [String] -> Expresion a
+formarEcuacion constantes [] = igualar (agregarVariables constantes) (last constantes)
+formarEcuacion constantes incognitas = igualar (agregarVariablesConNombre incognitas constantes) (last constantes)
