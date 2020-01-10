@@ -86,4 +86,15 @@ buscarEcuacionMinIncognita :: (Num a, Eq a) => [Expresion a] -> Expresion a
 buscarEcuacionMinIncognita (x:xs) | es1Incognita x = x
 	| es2Incognitas x = x
 	| otherwise = buscarEcuacionMinIncognita xs 
+
+--devolver una variable presente en la ecuacion
+variableEnEcuacion :: (Num a, Eq a) => Expresion a -> Expresion a
+variableEnEcuacion (Igual (Variable x) (Constante b)) = Variable x
+variableEnEcuacion (Igual (Producto (Constante r) (Variable x)) (Constante b)) = Variable x
+variableEnEcuacion (Igual (Suma (Variable x) (Constante k)) (Constante b)) = Variable x
+variableEnEcuacion (Igual (Suma (Producto (Constante r) (Variable x)) (Constante k)) (Constante b)) = Variable x
+variableEnEcuacion (Igual (Suma (Variable x) (Variable y)) (Constante b)) = Variable x
+variableEnEcuacion (Igual (Suma (Producto (Constante r) (Variable x)) (Variable y)) (Constante b)) = Variable x
+variableEnEcuacion (Igual (Suma (Variable x) (Producto (Constante r) (Variable y))) (Constante b)) = Variable x
+variableEnEcuacion (Igual (Suma (Producto (Constante r) (Variable x)) (Producto (Constante s) (Variable y))) (Constante b)) = Variable x
 --resolverSistema :: (Num a, Eq a, Fractional a) => [Expresion a] -> [Expresion a]
