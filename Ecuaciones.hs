@@ -37,8 +37,17 @@ formarEcuacion constantes [] = igualar (agregarVariables constantes) (last const
 formarEcuacion constantes incognitas = igualar (agregarVariablesConNombre incognitas constantes) (last constantes)
 
 --dada una variable de una ecuacion, se busca dejarla del lado izquierdo del igual
+--despeja hasta dos variables
 aislarVariable :: (Num a, Fractional a, Eq a) => Expresion a -> Expresion a-> Expresion a
-aislarVariable _ (Igual (Variable x) (Constante b)) = Igual (Variable x) (Constante b)
+
+aislarVariable var (Igual (Suma (Variable x) (Constante a)) (Constante b))
+	| var == Variable x = Igual var (Constante (b - a))
+
+aislarVariable var (Igual (Producto (Constante a) (Variable x)) (Constante b))
+	| var == Variable x = Igual var (Constante (b/a))
+
+aislarVariable var (Igual (Suma (Producto (Constante a) (Variable x)) (Constante k)) (Constante b))
+	| var == Variable x = Igual var (Constante ((b-k)/a))
 
 aislarVariable var (Igual (Suma (Variable x) (Variable y)) (Constante b)) 
 	| var == Variable x = Igual var (Constante b - Variable y)
@@ -55,3 +64,26 @@ aislarVariable var (Igual (Suma (Producto (Constante a) (Variable y)) (Variable 
 aislarVariable var (Igual (Suma (Producto (Constante r) (Variable x)) (Producto (Constante s) (Variable y))) (Constante b)) -- r*x + s*y = b
 	| var == Variable x = Igual var (Constante (b*(1/r)) - (Producto (Constante (s*(1/r))) (Variable y)))
 	| var == Variable y = Igual var (Constante (b*(1/s)) - (Producto (Constante (r*(1/s))) (Variable x)))
+
+aislarVariable var expr = expr
+
+--Encontrar una variable con 1 o 2 incógnitas
+es1Incognita :: (Num a, Eq a) => Expresion a -> Bool
+es1Incognita (Igual (Variable x) (Constante b)) = True
+es1Incognita (Igual (Producto (Constante r) (Variable x)) (Constante b)) = True
+es1Incognita (Igual (Suma (Variable x) (Constante k)) (Constante b)) = True
+es1Incognita (Igual (Suma (Producto (Constante r) (Variable x)) (Constante k)) (Constante b)) = True
+es1Incognita _ = False
+
+es2Incognitas :: (Num a, Eq a) => Expresion a -> Bool
+es2Incognitas (Igual (Suma (Variable x) (Variable y)) (Constante b)) = True
+es2Incognitas (Igual (Suma (Producto (Constante r) (Variable x)) (Variable y)) (Constante b)) = True
+es2Incognitas (Igual (Suma (Variable x) (Producto (Constante r) (Variable y))) (Constante b)) = True
+es2Incognitas (Igual (Suma (Producto (Constante r) (Variable x)) (Producto (Constante s) (Variable y))) (Constante b)) = True 
+es2Incognitas _ = False
+
+buscarEcuacionMinIncognita :: (Num a, Eq a) => [Expresion a] -> Expresion a
+buscarEcuacionMinIncognita (x:xs) | es1Incognita x = x
+	| es2Incognitas x = x
+	| otherwise = buscarEcuacionMinIncognita xs 
+--resolverSistema :: (Num a, Eq a, Fractional a) => [Expresion a] -> [Expresion a]

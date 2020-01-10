@@ -64,6 +64,9 @@ axiomas (Suma (Producto (Constante a) y) x)
 axiomas (Suma (Producto y (Constante a)) x) 
 	| x == y = Constante (a + 1) * axiomas x
 
+axiomas (Suma (Constante a) expr) = axiomas expr + Constante a
+axiomas (Producto expr (Constante a)) = Constante a * axiomas expr
+
 axiomas (Producto a b) = axiomas a * axiomas b
 
 axiomas (Suma a b) | a == b = (Constante 2) * axiomas a
