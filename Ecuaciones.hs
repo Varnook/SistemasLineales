@@ -17,8 +17,8 @@ rplzVar exprInicial exprABuscar exprIn | exprInicial == exprABuscar = exprIn
 	| otherwise = exprInicial
 
 --como se obtiene informacion del tipo de dato "Igual"
-igualdadEnTupla :: (Num a, Eq a) => Expresion a -> (Expresion a, Expresion a)
-igualdadEnTupla (Igual x b) = (x,b)
+igualdadADerecha :: (Num a, Eq a) => Expresion a -> Expresion a
+igualdadADerecha (Igual x b) = b
 
 --como pasar de un vector de Num a a una igualdad sin que se indique el nombre de las variables...
 agregarVariables :: (Num a) => [a] -> Expresion a
@@ -99,4 +99,13 @@ variableEnEcuacion (Igual (Suma (Variable x) (Variable y)) (Constante b)) = Vari
 variableEnEcuacion (Igual (Suma (Producto (Constante r) (Variable x)) (Variable y)) (Constante b)) = Variable x
 variableEnEcuacion (Igual (Suma (Variable x) (Producto (Constante r) (Variable y))) (Constante b)) = Variable x
 variableEnEcuacion (Igual (Suma (Producto (Constante r) (Variable x)) (Producto (Constante s) (Variable y))) (Constante b)) = Variable x
+
+--reemplazar en sistema
+reemplazarEnSistema :: Expresion a -> [Expresion a] -> [Expresion a]
+reemplazarEnSistema 
+--devuelve una variable de un sistema
+variableEnSistema :: (Num a, Eq a) => [Expresion a] -> Expresion a
+variableEnSistema sistema = variableEnEcuacion (buscarEcuacionMinIncognita sistema)
+
+
 --resolverSistema :: (Num a, Eq a, Fractional a) => [Expresion a] -> [Expresion a]
