@@ -10,6 +10,8 @@ rplzVar (Suma expr1 expr2) exprABuscar exprIn = (rplzVar expr1 exprABuscar exprI
 
 rplzVar  (Producto expr1 expr2) exprABuscar exprIn = (rplzVar expr1 exprABuscar exprIn) * (rplzVar expr2 exprABuscar exprIn)
 
+rplzVar (Igual expr1 expr2) exprABuscar exprIn = Igual (rplzVar expr1 exprABuscar exprIn) (rplzVar expr2 exprABuscar exprIn)
+
 rplzVar exprInicial exprABuscar exprIn | exprInicial == exprABuscar = exprIn
 	| simplificar (Producto (Constante (-1)) exprInicial) == exprABuscar = - exprIn -- -eIni == eAB = -eI
 	| otherwise = exprInicial
